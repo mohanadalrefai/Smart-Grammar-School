@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مكتبة القواعد الشاملة للأطفال</title>
+    <!-- استدعاء Tailwind CSS للتصميم -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- خط تجوال من جوجل لجمال النصوص العربية -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: #f8fafc; /* Slate-50 */
+        }
+
+        /* --- إعدادات الحركة ثلاثية الأبعاد (3D Flip) --- */
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.8s;
+            transform-style: preserve-3d;
+        }
+
+        /* الكلاس الذي سيضاف عند النقر لقلب البطاقة */
+        .flipped .card-inner {
+            transform: rotateY(180deg);
+        }
+
+        /* إخفاء الوجه الخلفي عند الدوران */
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden; /* Safari support */
+            border-radius: 1rem; /* rounded-2xl */
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1); /* shadow-xl */
+        }
+
+        /* الوجه الخلفي يحتاج دوران 180 درجة مسبقاً */
+        .card-back {
+            transform: rotateY(180deg);
+        }
+
+        /* إخفاء شريط التمرير داخل البطاقة الخلفية */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* تنسيق النصوص الإنجليزية */
+        .dir-ltr {
+            direction: ltr;
+            font-family: sans-serif;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-6">
+
+    <!-- العنوان الرئيسي -->
+    <div class="text-center mb-10 mt-4">
+        <h1 class="text-4xl md:text-5xl font-extrabold text-slate-800 mb-3 flex items-center justify-center gap-3">
+            <span class="text-blue-500">📖</span>
+            مكتبة القواعد الشاملة
+            <span class="text-yellow-400">✨</span>
+        </h1>
+        <p class="text-slate-500 text-lg font-medium">اضغط على أي بطاقة لاكتشاف السر خلف القاعدة!</p>
+    </div>
+
+    <!-- شبكة البطاقات -->
+    <div id="cards-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-7xl mx-auto pb-12">
+        <!-- سيتم توليد البطاقات هنا بواسطة JavaScript -->
+    </div>
+
+    <!-- تذييل الصفحة -->
+    <div class="fixed bottom-0 left-0 w-full bg-white/80 backdrop-blur text-center py-3 border-t text-slate-500 text-sm shadow-lg">
+        تذكر: الممارسة تصنع الأبطال! 💪
+    </div>
+
+    <script>
+        // --- بيانات البطاقات ---
+        const cardsData = [
+            // --- الأسماء ---
+            {
+                category: "الأسماء",
+                title: "الاسم (Noun)",
+                emoji: "🏡",
+                color: "bg-gradient-to-br from-blue-500 to-cyan-400",
+                explanation: "الاسم هو أي كلمة نطلقها على الناس، الحيوانات، الأماكن، أو الأشياء. الأسماء الخاصة (مثل أسماء الناس والبلاد) تبدأ دائماً بحرف كبير (Capital Letter).",
+                rule: "Person, Place, Animal, Thing",
+                example1: "Ahmed, London (Proper)",
+                example2: "cat, school, table (Common)"
+            },
+            {
+                category: "الأسماء",
+                title: "الجمع (Plurals)",
+                emoji: "📚",
+                color: "bg-gradient-to-br from-blue-500 to-cyan-400",
+                explanation: "لجعل الاسم جمعاً (أكثر من واحد)، نضيف عادة حرف 's' في النهاية. لكن إذا انتهت الكلمة بـ (s, x, ch, sh) نضيف 'es'.",
+                rule: "Noun + s / es",
+                example1: "One cat ➡️ Two cats",
+                example2: "One box ➡️ Two boxes"
+            },
+            {
+                category: "الأسماء",
+                title: "جمع شاذ (Irregular)",
+                emoji: "🦷",
+                color: "bg-gradient-to-br from-blue-500 to-cyan-400",
+                explanation: "هذه كلمات مشاغبة لا تقبل حرف 's'. شكل الكلمة يتغير تماماً عند الجمع ويجب حفظها كما هي.",
+                rule: "No 's' added!",
+                example1: "Man ➡️ Men",
+                example2: "Tooth ➡️ Teeth"
+            },
+            
+            // --- الضمائر والفاعل ---
+            {
+                category: "الضمائر",
+                title: "الفاعل (Subject)",
+                emoji: "🦸",
+                color: "bg-gradient-to-br from-purple-500 to-pink-400",
+                explanation: "الفاعل هو بطل الجملة! هو الشخص أو الشيء الذي يقوم بالفعل، ويأتي دائماً في بداية الجملة الإنجليزية قبل الفعل.",
+                rule: "Subject + Verb + Object",
+                example1: "The boy eats apple.",
+                example2: "(The boy) is the Subject."
+            },
+            {
+                category: "الضمائر",
+                title: "الضمائر (Pronouns)",
+                emoji: "👥",
+                color: "bg-gradient-to-br from-purple-500 to-pink-400",
+                explanation: "كلمات قصيرة تحل محل الاسم. نستخدم (He) للولد، (She) للبنت، (It) لغير العاقل، (They) للجمع، و (We) عندما أكون معهم.",
+                rule: "He, She, It / We, They, You",
+                example1: "Ahmed is happy ➡️ He is happy",
+                example2: "The cat runs ➡️ It runs"
+            },
+
+            // --- الأفعال والأزمنة ---
+            {
+                category: "الأفعال",
+                title: "الفعل (Verb)",
+                emoji: "🏃",
+                color: "bg-gradient-to-br from-green-500 to-emerald-400",
+                explanation: "الفعل هو المحرك للجملة. يخبرنا ماذا يفعل الفاعل (يجري، يأكل) أو حالته (يكون، يشعر). لا جملة بدون فعل!",
+                rule: "Action or State",
+                example1: "She swims fast.",
+                example2: "They play football."
+            },
+            {
+                category: "الأفعال",
+                title: "مضارع بسيط (Present)",
+                emoji: "🌞",
+                color: "bg-gradient-to-br from-green-500 to-emerald-400",
+                explanation: "نستخدمه للعادات والحقائق. القاعدة المهمة: مع المفرد (He, She, It) يجب إضافة حرف 's' للفعل. مع الجمع و (I) لا نضيف شيئاً.",
+                rule: "He/She/It + Verb(s)",
+                example1: "He likes pizza. (add s)",
+                example2: "I like pizza. (no s)"
+            },
+            {
+                category: "الأفعال",
+                title: "مستمر (Continuous)",
+                emoji: "⏳",
+                color: "bg-gradient-to-br from-green-500 to-emerald-400",
+                explanation: "شيء يحدث الآن! نحتاج شيئين: فعل مساعد (am/is/are) + الفعل مضافاً له (ing).",
+                rule: "am/is/are + Verb-ing",
+                example1: "I am reading now.",
+                example2: "She is sleeping."
+            },
+            {
+                category: "الأفعال",
+                title: "ماضي بسيط (Past)",
+                emoji: "🔙",
+                color: "bg-gradient-to-br from-green-500 to-emerald-400",
+                explanation: "شيء حدث وانتهى. للأفعال العادية نضيف 'ed' في النهاية. للأفعال الشاذة يتغير شكل الكلمة (Go ➡️ Went).",
+                rule: "Verb + ed (mostly)",
+                example1: "We played yesterday.",
+                example2: "I saw a bird. (Irregular)"
+            },
+            {
+                category: "الأفعال",
+                title: "مستقبل (Future)",
+                emoji: "🚀",
+                color: "bg-gradient-to-br from-green-500 to-emerald-400",
+                explanation: "للتحدث عن شيء سيحدث غداً أو لاحقاً. فقط نضع كلمة 'will' قبل الفعل الأصلي.",
+                rule: "Will + Verb",
+                example1: "I will travel tomorrow.",
+                example2: "It will rain."
+            },
+            {
+                category: "الأفعال",
+                title: "فعل الكينونة (To Be)",
+                emoji: "😐",
+                color: "bg-gradient-to-br from-green-500 to-emerald-400",
+                explanation: "أهم فعل في الإنجليزية! يعني (يكون). يتغير شكله حسب الفاعل: (I am)، (He/She is)، (You/We/They are).",
+                rule: "am / is / are",
+                example1: "I am a student.",
+                example2: "They are friends."
+            },
+
+            // --- الوصف والأدوات ---
+            {
+                category: "الوصف",
+                title: "الصفة (Adjective)",
+                emoji: "🎨",
+                color: "bg-gradient-to-br from-orange-500 to-amber-400",
+                explanation: "تصف الاسم. في الإنجليزية، الصفة تأتي *قبل* الاسم (عكس العربية). نقول (حمراء سيارة) وليس (سيارة حمراء).",
+                rule: "Adjective + Noun",
+                example1: "A red car.",
+                example2: "A happy boy."
+            },
+            {
+                category: "الوصف",
+                title: "النكرة (A / An)",
+                emoji: "🍎",
+                color: "bg-gradient-to-br from-orange-500 to-amber-400",
+                explanation: "نستخدم 'An' إذا بدأت الكلمة بصوت متحرك (a, e, i, o, u) لتسهيل النطق. نستخدم 'A' مع باقي الحروف الساكنة.",
+                rule: "An + (a,e,i,o,u) sound",
+                example1: "An apple, An egg.",
+                example2: "A book, A cat."
+            },
+            {
+                category: "الوصف",
+                title: "التعريف (The)",
+                emoji: "☝️",
+                color: "bg-gradient-to-br from-orange-500 to-amber-400",
+                explanation: "نستخدمها عندما نتكلم عن شيء محدد يعرفه المستمع، أو شيء يوجد منه واحد فقط في الكون.",
+                rule: "Specific things",
+                example1: "The sun is hot.",
+                example2: "Open the door (that one)."
+            },
+
+            // --- أخرى ---
+            {
+                category: "أدوات",
+                title: "حروف الجر (Prepositions)",
+                emoji: "📦",
+                color: "bg-gradient-to-br from-rose-500 to-red-400",
+                explanation: "تحدد المكان. In (داخل)، On (على السطح)، Under (تحت)، Next to (بجانب)، Between (بين شيئين).",
+                rule: "Location words",
+                example1: "The cat is on the box.",
+                example2: "The pen is in the bag."
+            },
+            {
+                category: "أدوات",
+                title: "إشارة (Demonstratives)",
+                emoji: "👉",
+                color: "bg-gradient-to-br from-rose-500 to-red-400",
+                explanation: "للإشارة للأشياء. للمفرد: This (قريب)، That (بعيد). للجمع: These (قريب)، Those (بعيد).",
+                rule: "This/That & These/Those",
+                example1: "This is my nose.",
+                example2: "Those are stars."
+            },
+            {
+                category: "أدوات",
+                title: "الملكية (Possessive 's)",
+                emoji: "🎒",
+                color: "bg-gradient-to-br from-rose-500 to-red-400",
+                explanation: "نضيف الفاصلة العليا وحرف s للاسم لنوضح أن ما بعدها ملك له.",
+                rule: "Owner's Item",
+                example1: "Ali's book (كتاب علي)",
+                example2: "The cat's tail (ذيل القطة)"
+            },
+            {
+                category: "القواعد",
+                title: "النفي (Negative)",
+                emoji: "🙅",
+                color: "bg-gradient-to-br from-slate-600 to-slate-400",
+                explanation: "لنقول 'لا' في المضارع. نستخدم Don't مع الجمع و I. نستخدم Doesn't مع المفرد (He/She/It) ونحذف الـ s من الفعل!",
+                rule: "Don't / Doesn't + Base Verb",
+                example1: "I don't like bananas.",
+                example2: "He doesn't play (not plays)."
+            },
+        ];
+
+        // --- دالة توليد البطاقات ---
+        function renderCards() {
+            const container = document.getElementById('cards-container');
+            
+            cardsData.forEach(card => {
+                // إنشاء عنصر البطاقة الخارجي
+                const cardElement = document.createElement('div');
+                cardElement.className = 'h-80 w-full perspective-1000 cursor-pointer group';
+                
+                // إضافة الهيكل الداخلي
+                cardElement.innerHTML = `
+                    <div class="card-inner relative w-full h-full duration-700 transform-style-3d transition-transform">
+                        
+                        <!-- الوجه الأمامي -->
+                        <div class="card-face ${card.color} border-4 border-white flex flex-col items-center justify-center p-4 text-white">
+                            <div class="absolute top-3 left-3 opacity-60 text-2xl">✨</div>
+                            
+                            <div class="text-7xl mb-4 drop-shadow-md transform transition-transform duration-300 hover:scale-110">
+                                ${card.emoji}
+                            </div>
+                            
+                            <h3 class="text-2xl font-bold text-center drop-shadow-md mb-2">
+                                ${card.title}
+                            </h3>
+                            <span class="text-sm font-light bg-white/20 px-3 py-1 rounded-full">
+                                ${card.category}
+                            </span>
+                            
+                            <div class="absolute bottom-4 text-xs opacity-80 animate-pulse">
+                                اضغط للقلب 👆
+                            </div>
+                        </div>
+
+                        <!-- الوجه الخلفي -->
+                        <div class="card-face card-back bg-white border-4 border-slate-100 p-4 flex flex-col overflow-y-auto no-scrollbar">
+                            <!-- عنوان صغير -->
+                            <div class="flex items-center gap-2 mb-2 border-b pb-2">
+                                <span class="text-2xl">${card.emoji}</span>
+                                <span class="font-bold text-slate-700 text-sm">القاعدة الذهبية</span>
+                            </div>
+
+                            <!-- الشرح الموسع -->
+                            <div class="text-xs text-slate-600 font-medium leading-relaxed mb-3 text-right">
+                                ${card.explanation}
+                            </div>
+
+                            <!-- القاعدة المختصرة -->
+                            <div class="bg-amber-50 rounded-lg p-2 mb-3 border border-amber-100 text-center">
+                                <p class="text-amber-700 font-bold text-xs dir-ltr font-mono">
+                                    ${card.rule}
+                                </p>
+                            </div>
+
+                            <!-- أمثلة -->
+                            <div class="mt-auto bg-blue-50 p-2 rounded-lg text-center">
+                                <span class="text-blue-400 text-[10px] font-bold block mb-1">أمثلة:</span>
+                                <p class="text-blue-800 font-bold text-sm dir-ltr">
+                                    ${card.example1}
+                                </p>
+                                <p class="text-blue-600 text-xs dir-ltr mt-1">
+                                    ${card.example2}
+                                </p>
+                            </div>
+                        </div>
+
+                    </div>
+                `;
+
+                // إضافة حدث النقر للقلب
+                cardElement.addEventListener('click', function() {
+                    this.classList.toggle('flipped');
+                });
+
+                // إضافة البطاقة للحاوية
+                container.appendChild(cardElement);
+            });
+        }
+
+        // تشغيل الدالة عند تحميل الصفحة
+        document.addEventListener('DOMContentLoaded', renderCards);
+
+    </script>
+</body>
+</html>
+
